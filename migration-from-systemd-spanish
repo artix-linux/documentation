@@ -1,0 +1,171 @@
+Pon estos repositorios en /etc/pacman.conf *antes* de los repositorios oficiales de Arch/Manjaro y deshabilita [core] del último:
+
+# Repositorios de Artix
+[system]
+Include = /etc/pacman.d/mirrorlist
+[world]
+Include = /etc/pacman.d/mirrorlist
+[galaxy]
+Include = /etc/pacman.d/mirrorlist
+
+# Repositorios de Arch
+# [core]
+# Include = /etc/pacman.d/mirrorlist-arch
+[extra]
+Include = /etc/pacman.d/mirrorlist-arch
+[community]
+Include = /etc/pacman.d/mirrorlist-arch
+# [multilib]
+# Include = /etc/pacman.d/mirrorlist-arch
+
+Por ahora, el repositorio [multilib] sólo está disponible desde Arch o Manjaro, pero eventualmente estará disponible desde Artix.
+Los repositorios [arch-openrc] y [arch-nosystemd] (o [openrc-eudev] si aún estás en él) se tienen que deshabilitar.
+
+2. Renombra /etc/pacman.d/mirrorlist a /etc/pacman.d/mirrorlist-arch
+
+mv /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist-arch
+
+3. Crea un nuevo /etc/pacman.d/mirrorlist, refresca las bases de datos e instala el llavero (keyring) nuevo. Este llavero se puede instalar bajando los niveles de seguridad en pacman.conf o evitando pacman, como se ve abajo.
+
+cat > /etc/pacman.d/mirrorlist >>EOF
+
+# Mirrors mundiales
+Server = https://netcologne.dl.sourceforge.net/project/artix-linux/repos/\$repo/os/\$arch
+Server = https://artix.mief.nl/repos/\$repo/os/\$arch
+Server = https://mirrors.dotsrc.org/artix-linux/repos/\$repo/os/\$arch
+Server = http://mirror.strits.dk/artix-linux/repos/\$repo/os/\$arch
+Server = http://mirror1.artixlinux.org/artix-linux/repos/\$repo/os/\$arch
+Server = https://freefr.dl.sourceforge.net/project/artix-linux/repos/\$repo/os/\$arch
+Server = https://10gbps-io.dl.sourceforge.net/project/artix-linux/repos/\$repo/os/\$arch
+Server = https://netix.dl.sourceforge.net/project/artix-linux/repos/\$repo/os/\$arch
+Server = https://kent.dl.sourceforge.net/project/artix-linux/repos/\$repo/os/\$arch
+Server = https://superb-dca2.dl.sourceforge.net/project/artix-linux/repos/\$repo/os/\$arch
+Server = https://pilotfiber.dl.sourceforge.net/project/artix-linux/repos/\$repo/os/\$arch
+Server = https://iweb.dl.sourceforge.net/project/artix-linux/repos/\$repo/os/\$arch
+Server = https://managedway.dl.sourceforge.net/project/artix-linux/repos/\$repo/os/\$arch
+Server = https://cfhcable.dl.sourceforge.net/project/artix-linux/repos/\$repo/os/\$arch
+Server = https://svwh.dl.sourceforge.net/project/artix-linux/repos/\$repo/os/\$arch
+Server = https://versaweb.dl.sourceforge.net/project/artix-linux/repos/\$repo/os/\$arch
+Server = https://cytranet.dl.sourceforge.net/project/artix-linux/repos/\$repo/os/\$arch
+Server = https://gigenet.dl.sourceforge.net/project/artix-linux/repos/\$repo/os/\$arch
+Server = https://excellmedia.dl.sourceforge.net/project/artix-linux/repos/\$repo/os/\$arch
+Server = https://liquidtelecom.dl.sourceforge.net/project/artix-linux/repos/\$repo/os/\$arch
+Server = https://phoenixnap.dl.sourceforge.net/project/artix-linux/repos/\$repo/os/\$arch
+Server = https://superb-sea2.dl.sourceforge.net/project/artix-linux/repos/\$repo/os/\$arch
+Server = https://ayera.dl.sourceforge.net/project/artix-linux/repos/\$repo/os/\$arch
+Server = https://ufpr.dl.sourceforge.net/project/artix-linux/repos/\$repo/os/\$arch
+Server = https://razaoinfo.dl.sourceforge.net/project/artix-linux/repos/\$repo/os/\$arch
+Server = https://jaist.dl.sourceforge.net/project/artix-linux/repos/\$repo/os/\$arch
+Server = https://ncu.dl.sourceforge.net/project/artix-linux/repos/\$repo/os/\$arch
+Server = https://nchc.dl.sourceforge.net/project/artix-linux/repos/\$repo/os/\$arch
+Server = https://vorboss.dl.sourceforge.net/project/artix-linux/repos/\$repo/os/\$arch
+EOF
+
+Limpia todo el cache, porque algunos de nuestros paquetes tienen una firma diferente y pacman se quejará. Si tienes un cache 
+grande y lo quieres mantener, no ejecutes pacman -Scc pero se te va a pedir que borres algunos paquetes corruptos y los 
+redescarges. Después, fuerza la sincronización:
+
+pacman -Scc && pacman -Syy
+
+Para instalar artix-keyring, debes firmar una llave maestra manualmente:
+
+pacman -S artix-keyring
+pacman-key --populate artix
+pacman-key --lsign-key 78C9C713EAD7BEC69087447332E21894258C6105
+
+Guarda una lista de tus daemons de systemd ejecutándose, necesitarás instalar los scripts correspondientes de OpenRC más tarde.
+
+systemctl list-units --state=running | grep -v systemd | awk '{print $1}' | grep service > daemon.list
+
+Ya estás listo para la instalación de los componentes de Artix, así como los nuevos scripts de inicio para tus servicios de systemd.
+
+Deberías descargar los paquetes básicos en el cache de pacman (no es realmente obligatorio, pero si pierdes la conexión a Internet en el medio de la actualización, puede que eso te deje sin sistema de inicio). También debes descargar los paquetes linux-lts y linux-lts-headers, debido a que Artix usa el núcleo LTS (long term support) más nuevo. Los grupos base y base-devel también se deben reinstalar para que sean sustituidos por los que estan en el repositorio [system]. Finalmente, el grupo openrc-world proporciona scripts de inicio para servicios como NetworkManager, bluez (para bluetooth) o cups (para imprimir):
+
+pacman -Sw base base-devel openrc-system grub linux-lts linux-lts-headers systemd-dummy libsystemd-dummy openrc-world
+
+Ahora que los paquetes están en cache, puedes eliminar los paquetes de systemd (contesta 'yes' a todas las preguntas de pacman de abajo).
+
+pacman -Rdd systemd libsystemd
+
+Después de que hayas hecho esto también debes completar el próximo paso, de otro modo te quedarías sin sistema de inicio. Si estás haciendo esto remotamente (a través de SSH, por ejemplo), mantén otra sesión de SSH abierta, por si la primera deja de funcionar, lo cual puede pasar. Ahora puedes instalar los paquetes previamente descargados con 'pacman -Sw': 
+
+pacman -S base base-devel openrc-system grub linux-lts linux-lts-headers systemd-dummy libsystemd-dummy openrc-world openrc netifrc grub mkinitcpio
+
+Además, instala y habilita los scripts de inicio para tus servicios en ejecución, aquí hay un ejemplo:
+
+pacman -S --needed acpid-openrc alsa-utils-openrc autofs-openrc cronie-openrc cups-openrc displaymanager-openrc fuse-openrc haveged-openrc hdparm-openrc openssh-openrc samba-openrc syslog-ng-openrc
+
+for daemon in acpid alsasound autofs cronie cupsd xdm fuse haveged hdparm smb sshd syslog-ng; do rc-update add $daemon default; done
+
+Necesitas habilitar udev, dbus y elogind, excepto si sabes lo que haces:
+
+rc-update add udev boot
+rc-update add elogind boot
+rc-update add dbus default
+
+Ahora, copia los nuevos archivos /etc/mkinitcpio.pacnew en /etc/mkinitcpio, /etc/default/grub.pacnew en /etc/default/grub, y 
+recrea el initramfs del núcleo con mkinitcpio y reinstala grub. Si has hecho algún cambio a los archivos originales (por ejemplo,
+resume hook en mkinitcpio.conf o un parámetro del núcleo en grub), deberías unirlos ahora.
+
+Edita tu archivo de configuración de red, es /etc/conf.d/net. Esto es especialmente importante si estás haciendo este proceso en
+un ordenador remoto, porque si no lo haces, podrías quedarte sin acceso a éste. Dependiendo de si usas nombres de dispositivos 
+persistentes o no, debes hacer un symlink de /etc/init.d/net.lo a net.enp0s3 o net.eth0. Los nombres de interfaces sólo son 
+ejemplos, asegúrate de encontrar el equivalente de tu sistema. Si estás dudando (y sólo tienes una interfaz ethernet), puedes 
+desactivar nombres de dispositivos persistentes con una línea de comandos del núcleo (GRUB_CMDLINE_LINUX, abajo) y usar net.eth0,
+si no, omítelo.
+
+vi /etc/conf.d/net
+echo 'GRUB_CMDLINE_LINUX="net.ifnames=0"' >>/etc/default/grub		# disable persistent device naming
+ln -s /etc/init.d/net.lo /etc/init.d/net.eth0
+rc-update add net.eth0 boot
+
+Si tienes LVM, debes instalar los paquetes lvm2-openrc y device-mapper-openrc, si no, los volúmenes lógicos estarán inactivos 
+después del reinicio. Estos dos paquetes son parte del grupo openrc-system, así que probablemente ya los tendrás instalados. 
+Haz que los servicios se inicien al iniciarse el sistema operativo:
+
+rc-update add lvm boot
+rc-update add device-mapper boot
+
+Puedes eliminar cuentas de systemd, las cuales ya no sirven para nada:
+
+for user in systemd-journal systemd-journal-gateway systemd-timesync systemd-network systemd-bus-proxy systemd-journal-remote systemd-journal-upload; do userdel $user; done
+
+Asegúrate de eliminar cualquier 'init=/usr/lib/systemd/systemd' o directivas similares de tu configuración de bootloader, 
+el núcleo Linux por defecto ejecuta /sbin/init. Además, elimina cualquier directiva 'x-systemd' from /etc/fstab. Recrea tu 
+initramfs y archivo de configuración de grub.
+
+mkinitcpio -p linux-lts (el núcleo que viene con Artix por defecto) o mkinitcpio -P (todos los núcleos instalados)
+update-grub
+
+Reinstala GRUB:
+-> Para UEFI: 
+grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=grub 
+grub-install --target=x86_64-efi --efi-directory=esp_mount --bootloader-id=grub (ditto, a user reported success with this one)
+
+-> Para BIOS: 
+grub-install /dev/sdX (replace sdX with sda, sdb, or whatever your disk is)
+
+Edita /etc/rc.conf como quieras. Un ajuste común a hacer es rc_parallel="YES", pero haz esto únicamente después de haber iniciado 
+tu sistema una vez. También tienes que editar los archivos de configuración para tu nombre de host, teclado, mapa de teclado, 
+y local. 
+
+echo "hostname="`hostname` >| /etc/conf.d/hostname
+vi /etc/conf.d/keymaps
+vi /etc/conf.d/consolefont
+vi /etc/locale.conf
+
+Instala un gestor de pantalla, sddm es el usado por Artix en sus ISOs, y edita DISPLAYMANAGER en /etc/conf.d/xdm a "sddm".
+
+pacman -S sddm artix-sddm-theme
+sed -i 's/DISPLAYMANAGER="mdm"/DISPLAYMANAGER="sddm"/' /etc/conf.d/xdm
+
+No serás capaz de reiniciar tu ordenador de manera normal, debido a que PID 1 ya no existe. Hazlo con el trigger del núcleo SysRq.
+
+umount -a
+mount -f / -o remount,ro
+echo s >| /proc/sysrq-trigger
+echo u >| /proc/sysrq-trigger
+echo b >| /proc/sysrq-trigger
+
+Configuración adicional podría ser necesaria, especialmente con respecto a funcionalidad de escritorio. La sección de configuración en systemd-free.org te
+dará algunas ideas.
