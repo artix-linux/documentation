@@ -27,7 +27,7 @@ mv /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist-arch
 
 3. Crea un nuevo /etc/pacman.d/mirrorlist, refresca las bases de datos e instala el llavero (keyring) nuevo. Este llavero se puede instalar bajando los niveles de seguridad en pacman.conf o evitando pacman, como se ve abajo.
 
-cat > /etc/pacman.d/mirrorlist >>EOF
+cat > /etc/pacman.d/mirrorlist <<EOF
 
 # Mirrors mundiales
 Server = https://netcologne.dl.sourceforge.net/project/artix-linux/repos/\$repo/os/\$arch
