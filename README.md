@@ -27,20 +27,20 @@ Usage: buildtree [options]
 ~~~
 
 
-= To sync (clone or pull) the Arch and Artix git repos (use `-sz` to only sync Artix git):
+To sync (clone or pull) the Arch and Artix git repos (use `-sz` to only sync Artix git):
 
     buildtree -s
 
-= The most interesting option is `-c`. It compares Arch and Artix package versions, combined with `-u` for upgrades and `-d` for downgrades (i.e. shows which packages are newer or older upstream). The testing repos are omitted.
+The most interesting option is `-c`. It compares Arch and Artix package versions, combined with `-u` for upgrades and `-d` for downgrades (i.e. shows which packages are newer or older upstream). The testing repos are omitted.
 
     buildtree -cu
     buildtree -cd
 
-= We can do it in one step:
+We can do it in one step:
 
     buildtree -scu
 
-= To compare Arch and Artix versions in **_gremlins]/[goblins]_** - **_[testing]/[staging_**, use `-a`:
+To compare Arch and Artix versions in **_gremlins]/[goblins]_** - **_[testing]/[staging_**, use `-a`:
 
     buildtree -ca
 
@@ -83,19 +83,19 @@ The symlinks above call `commitpkg` which copies the contents of _packages/foo/t
 
 #### Some examples
 
-= ###### After we've imported `foo` from Arch, we want to put it in **_testing_** (i.e. **_gremlins_**). So, we release it from trunk into repos/testing and push with `-u` (in this case `-s trunk` can be omitted, as `-s` defaults to _trunk_):
+##### After we've imported `foo` from Arch, we want to put it in **_testing_** (i.e. **_gremlins_**). So, we release it from trunk into repos/testing and push with `-u` (in this case `-s trunk` can be omitted, as `-s` defaults to _trunk_):
 
     testingpkg -p foo -s trunk -u
 
-= ###### Once `foo` has been tested to kingdom come, we decide to move it from **_testing_** to **_core_**:
+##### Once `foo` has been tested to kingdom come, we decide to move it from **_testing_** to **_core_**:
 
     corepkg -p foo -s testing -u
 
 The build server will move `foo` from **_gremlins_** to **_system_**.
 
-= ##### Packages can only be moved between repos **_only_** after they've been built. If a build has failed, you can't move the package to another repo, because there isn't one (package).
+##### Packages can only be moved between repos **_only_** after they've been built. If a build has failed, you can't move the package to another repo, because there isn't one (package).
 
-= ###### Package 'foo2' (already in **_community/galaxy_**) has been updated, as indicated by `buildtree -scu`. We must import the updates into the Artix trunk, edit the source files if needed and push the updates to the build server (again, `-s trunk` can be omitted):
+###### Package 'foo2' (already in **_community/galaxy_**) has been updated, as indicated by `buildtree -scu`. We must import the updates into the Artix trunk, edit the source files if needed and push the updates to the build server (again, `-s trunk` can be omitted):
 
     buildtree -i -p foo2
     (edit $workspace_dir/artix/packages-galaxy/foo2/trunk/PKGBUILD or any other source files inside trunk)
