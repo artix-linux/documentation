@@ -5,7 +5,7 @@ Artix system and world packages
 
 The packages git follows the archlinux svn structure. It contains both **_core_** and **_extra_** PKGBUILDs, **_system_** and **_world_** in Artix respectively. Packages from **_community_** are accommodated in the `packages-galaxy` git tree.
 
-Each package directory consists of a trunk and repos subdirectories. Artix packages get updated from upstream Arch in trunk (using `buildtree -s`) and any necessary modifications are performed there. Once done, the maintainer can commit/push the updated package into its destination repo and only then the build server will pick up the update and attempt to build the package (i.e. as long as the changes remain in trunk, nothing leaves the room). It's recommended to copy `/etc/artools/artools.conf` to `~/.config/artools/artools.conf` and set the _workspace_dir_ option to a place with a few spare GBs of space.
+Each package directory consists of a trunk and repos subdirectories. Artix packages get updated from upstream Arch in trunk (using `buildtree -s`) and any necessary modifications are performed there. Once done, the maintainer can commit/push the updated package into its destination repo and only then the build server will pick up the update and attempt to build the package (i.e. as long as the changes remain in trunk, nothing leaves the room). It's recommended to copy `/etc/artools/artools.conf` to `~/.config/artools/artools.conf` and set the **workspace_dir** option to a place with a few spare GBs of space.
 
 Here's an overview of `buildtree`:
 ~~~
@@ -90,9 +90,10 @@ The symlinks above call `commitpkg` which copies the contents of _packages/foo/t
 
 The build server will move `foo` from **_gremlins_** to **_system_**.
 
-###### Package 'foo2' in **_community_** has been updated, as indicated by `buildtree -scu`. We must import the updates into the Artix trunk, edit the source files if needed and push the updates to the build server (again, `-s trunk` can be omitted):
+###### Package 'foo2' (already in **_community/galaxy_**) has been updated, as indicated by `buildtree -scu`. We must import the updates into the Artix trunk, edit the source files if needed and push the updates to the build server (again, `-s trunk` can be omitted):
 
     buildtree -i -p foo2
+    (edit $workspace_dir/
     communitypkg -p foo2 -s trunk -u
 
 ###### Move packages 'foo2' from repos/staging to repos/testing:
@@ -107,10 +108,10 @@ The build server will move `foo` from **_gremlins_** to **_system_**.
 
     multilib-testingpkg -p foo4 -s trunk -u
 
-###### Move packages 'foo4' from repos/multilib-testing to repos/multilib:
+###### Suppose you've accidentally pushed **_multilib_**/foo4 into **_community_** with `communitypkg -p foo4 -u` and want to fix the screw-up. This is where we need a direct call of commitpkg, because the symlinks will not perform `-r` to remove a package from a repo.
 
-    multilibpkg -p foo4 -s multilib-testing -u
-
+    commitpkg -p foo4 -s community -ru     # To remove foo4 from community
+    multilibpkg -p foo4 -u                 # To push foo4 into multilib
 
 #### Use one `commitpkg` symlink operation at a time, i.e. do not edit both ``foo`` and ``bar`` and then `communitypkg -p foo -u`; `commitpkg` will complain about dirty workspace and rebase.
 
