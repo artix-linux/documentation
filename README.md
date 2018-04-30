@@ -46,11 +46,14 @@ To compare Arch and Artix versions in **_gremlins]/[goblins]_** - **_[testing]/[
 
 Note, the above check will use the Artix repos as a base, not Arch's. For example, if `fscktheskullofsystemd` is in Artix/**_galaxy_** and Arch/**_community-testing_**, it won't show up in the list.
 
-Now, suppose we saw a shiny package named `foo` in Arch which unfortunately is compiled against _libsystemd.so_ and we want to import it into our repos for proper treatment. We issue:
+###### Also, `buildtree` will show the actual repo where a package resides. For example, `wine` belongs to **_multilib_** but in the git tree it's under **_community_**. All `commitpkg` (and its symlinks) operations must be performed using the repo name and not the git subdirectory name.
 
+Now, suppose we saw a shiny package named `foo` in Arch which unfortunately is compiled against _libsystemd.so_ and we want to import it into our repos for proper treatment. We'd like to see some information about it and then import it, so we issue:
+
+    buildtree -v -p foo
     buildtree -p foo -i
 
-which imports `foo` in _$workspace_dir/artix/packages/foo/trunk_. Now we can edit the source files and/or the PKGBUILD to our liking. Once we're done, we'll need to commit the changes back to the git tree using `commitpkg`, which standardizes the actions with descriptive commit messages. Keep in mind, `commitpkg` by default updates the trunk; in order to copy the package into an active repo (and inform the build server about it), we must use the appropriate `commitpkg` symlink, as explained below. First, an overview of `commitpkg`:
+and we end up with `foo` in _$workspace_dir/artix/packages/foo/trunk_. Now we can edit the source files and/or the PKGBUILD to our liking. Once we're done, we'll need to commit the changes back to the git tree using `commitpkg`, which standardizes the actions with descriptive commit messages. Keep in mind, `commitpkg` by default updates the trunk; in order to copy the package into an active repo (and inform the build server about it), we must use the appropriate `commitpkg` symlink, as explained below. First, an overview of `commitpkg`:
 
 ~~~
 $ commitpkg -h
@@ -90,10 +93,12 @@ The symlinks above call `commitpkg` which copies the contents of _packages/foo/t
 
 The build server will move `foo` from **_gremlins_** to **_system_**.
 
+##### Packages can only be moved between repos **_only_** after they've been built. If a build has failed, you can't move the package to another repo, because there isn't one (package).
+
 ###### Package 'foo2' (already in **_community/galaxy_**) has been updated, as indicated by `buildtree -scu`. We must import the updates into the Artix trunk, edit the source files if needed and push the updates to the build server (again, `-s trunk` can be omitted):
 
     buildtree -i -p foo2
-    (edit $workspace_dir/
+    (edit $workspace_dir/artix/packages-galaxy/foo2/trunk/PKGBUILD or any other source files inside trunk)
     communitypkg -p foo2 -s trunk -u
 
 ###### Move packages 'foo2' from repos/staging to repos/testing:
@@ -108,7 +113,7 @@ The build server will move `foo` from **_gremlins_** to **_system_**.
 
     multilib-testingpkg -p foo4 -s trunk -u
 
-###### Suppose you've accidentally pushed **_multilib_**/foo4 into **_community_** with `communitypkg -p foo4 -u` and want to fix the screw-up. This is where we need a direct call of commitpkg, because the symlinks will not perform `-r` to remove a package from a repo.
+#### Suppose you've accidentally pushed **_multilib_**/foo4 into **_community_** with `communitypkg -p foo4 -u` and want to fix the screw-up. The build will fail in the first place, because of missing lib32 depends and there won't be any built package to move anyway. This is where we need a direct call of commitpkg, because the symlinks will not perform `-r` to remove a package from a repo.
 
     commitpkg -p foo4 -s community -ru     # To remove foo4 from community
     multilibpkg -p foo4 -u                 # To push foo4 into multilib
