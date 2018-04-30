@@ -36,11 +36,15 @@ The most interesting option is `-c`. It compares Arch and Artix package versions
     buildtree -cu
     buildtree -cd
 
+We can do it in one step:
+
+    buildtree -scu
+
 To compare Arch and Artix versions in **_gremlins]/[goblins] - [testing]/[staging_**, use `-a`:
 
     buildtree -ca
 
-Note, the above check will use the Artix repos as a base, not Arch's. For example, if `foo` is in Artix/**_galaxy_** and Arch/**_community-testing_**, it won't show up in the list.
+Note, the above check will use the Artix repos as a base, not Arch's. For example, if `fscktheskullofsystemd` is in Artix/**_galaxy_** and Arch/**_community-testing_**, it won't show up in the list.
 
 Now, suppose we saw a shiny package named `foo` in Arch which unfortunately is compiled against _libsystemd.so_ and we want to import it into our repos for proper treatment. We issue:
 
@@ -86,15 +90,16 @@ The symlinks above call `commitpkg` which copies the contents of _packages/foo/t
 
 The build server will move `foo` from **_gremlins_** to **_system_**.
 
-###### Release package 'foo2' from trunk into repos/staging and push (again, `-s trunk` can be ommitted):
+###### Package 'foo2' in **_community_** has been updated, as indicated by `buildtree -scu`. We must import the updates into the Artix trunk, edit the source files if needed and push the updates to the build server (again, `-s trunk` can be ommitted):
 
-    stagingpkg -p foo2 -s trunk -u
+    buildtree -i -p foo2
+    communitypkg -p foo2 -s trunk -u
 
 ###### Move packages 'foo2' from repos/staging to repos/testing:
 
     testingpkg -p foo2 -s staging -u
 
-###### Release package 'foo3' from trunk to repos/community(yes, `-s trunk` can be ommitted):
+###### Release package 'foo3' from trunk to repos/community (yes, `-s trunk` can be ommitted):
 
     communitypkg -p foo3 -s trunk -u
 
@@ -102,7 +107,7 @@ The build server will move `foo` from **_gremlins_** to **_system_**.
 
     multilib-testingpkg -p foo4 -s trunk -u
 
-###### Move packages 'foo4' from repos/multilib-testing to repos/multilib and push
+###### Move packages 'foo4' from repos/multilib-testing to repos/multilib:
 
     multilibpkg -p foo4 -s multilib-testing -u
 
