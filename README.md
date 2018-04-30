@@ -31,7 +31,7 @@ To sync (clone or pull) the Arch and Artix git repos (use `-sz` to only sync Art
 
     buildtree -s
 
-The most interesting option is `-c`. It compares Arch and Artix package versions, combined with `-u` for upgrades and `-d` for downgrades (i.e. shows which packages are newer or older upstream):
+The most interesting option is `-c`. It compares Arch and Artix package versions, combined with `-u` for upgrades and `-d` for downgrades (i.e. shows which packages are newer or older upstream). The testing repos are omitted.
 
     buildtree -cu
     buildtree -cd
@@ -40,7 +40,7 @@ We can do it in one step:
 
     buildtree -scu
 
-To compare Arch and Artix versions in **_gremlins]/[goblins] - [testing]/[staging_**, use `-a`:
+To compare Arch and Artix versions in **_gremlins]/[goblins]_** - **_[testing]/[staging_**, use `-a`:
 
     buildtree -ca
 
@@ -80,7 +80,7 @@ The symlinks above call `commitpkg` which copies the contents of _packages/foo/t
 
 #### Some examples
 
-###### After we've imported `foo` from Arch, we want to put it in **_testing_** (i.e. **_gremlins_**). So, we release it from trunk into repos/testing and push with `-u` (in this case `-s trunk` can be ommitted, as `-s` defaults to _trunk_):
+###### After we've imported `foo` from Arch, we want to put it in **_testing_** (i.e. **_gremlins_**). So, we release it from trunk into repos/testing and push with `-u` (in this case `-s trunk` can be omitted, as `-s` defaults to _trunk_):
 
     testingpkg -p foo -s trunk -u
 
@@ -90,7 +90,7 @@ The symlinks above call `commitpkg` which copies the contents of _packages/foo/t
 
 The build server will move `foo` from **_gremlins_** to **_system_**.
 
-###### Package 'foo2' in **_community_** has been updated, as indicated by `buildtree -scu`. We must import the updates into the Artix trunk, edit the source files if needed and push the updates to the build server (again, `-s trunk` can be ommitted):
+###### Package 'foo2' in **_community_** has been updated, as indicated by `buildtree -scu`. We must import the updates into the Artix trunk, edit the source files if needed and push the updates to the build server (again, `-s trunk` can be omitted):
 
     buildtree -i -p foo2
     communitypkg -p foo2 -s trunk -u
@@ -99,11 +99,11 @@ The build server will move `foo` from **_gremlins_** to **_system_**.
 
     testingpkg -p foo2 -s staging -u
 
-###### Release package 'foo3' from trunk to repos/community (yes, `-s trunk` can be ommitted):
+###### Release package 'foo3' from trunk to repos/community (yes, `-s trunk` can be omitted):
 
     communitypkg -p foo3 -s trunk -u
 
-###### Release package 'foo4' from trunk to repos/multilib-testing and push (in case you're still wondering, `-s trunk` can be ommitted):
+###### Release package 'foo4' from trunk to repos/multilib-testing and push (in case you're still wondering, `-s trunk` can be omitted):
 
     multilib-testingpkg -p foo4 -s trunk -u
 
