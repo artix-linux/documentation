@@ -27,26 +27,26 @@ Usage: buildtree [options]
 ~~~
 
 
-To sync (clone or pull) the Arch and Artix git repos (use `-sz` to only sync Artix git):
+* To sync (clone or pull) the Arch and Artix git repos (use `-sz` to only sync Artix git):
 
     buildtree -s
 
-The most interesting option is `-c`. It compares Arch and Artix package versions, combined with `-u` for upgrades and `-d` for downgrades (i.e. shows which packages are newer or older upstream). The testing repos are omitted.
+* The most interesting option is `-c`. It compares Arch and Artix package versions, combined with `-u` for upgrades and `-d` for downgrades (i.e. shows which packages are newer or older upstream). The testing repos are omitted.
 
     buildtree -cu
     buildtree -cd
 
-We can do it in one step:
+* We can do it in one step:
 
     buildtree -scu
 
-To compare Arch and Artix versions in **_gremlins]/[goblins]_** - **_[testing]/[staging_**, use `-a`:
+* To compare Arch and Artix versions in **_gremlins]/[goblins]_** - **_[testing]/[staging_**, use `-a`:
 
     buildtree -ca
 
-Note, the above check will use the Artix repos as a base, not Arch's. For example, if `fscktheskullofsystemd` is in Artix/**_galaxy_** and Arch/**_community-testing_**, it won't show up in the list.
+* Note, the above check will use the Artix repos as a base, not Arch's. For example, if `fscktheskullofsystemd` is in Artix/**_galaxy_** and Arch/**_community-testing_**, it won't show up in the list.
 
-###### Also, `buildtree` will show the actual repo where a package resides. For example, `wine` belongs to **_multilib_** but in the git tree it's under **_community_**. All `commitpkg` (and its symlinks) operations must be performed using the repo name and not the git subdirectory name.
+* ###### Also, `buildtree` will show the actual repo where a package resides. For example, `wine` belongs to **_multilib_** but in the git tree it's under **_community_**. All `commitpkg` (and its symlinks) operations must be performed using the repo name and not the git subdirectory name.
 
 Now, suppose we saw a shiny package named `foo` in Arch which unfortunately is compiled against _libsystemd.so_ and we want to import it into our repos for proper treatment. We'd like to see some information about it and then import it, so we issue:
 
