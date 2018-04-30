@@ -27,20 +27,20 @@ Usage: buildtree [options]
 ~~~
 
 
-* To sync (clone or pull) the Arch and Artix git repos (use `-sz` to only sync Artix git):
+- To sync (clone or pull) the Arch and Artix git repos (use `-sz` to only sync Artix git):
 
-    buildtree -s
+buildtree -s
 
-* The most interesting option is `-c`. It compares Arch and Artix package versions, combined with `-u` for upgrades and `-d` for downgrades (i.e. shows which packages are newer or older upstream). The testing repos are omitted.
+- The most interesting option is `-c`. It compares Arch and Artix package versions, combined with `-u` for upgrades and `-d` for downgrades (i.e. shows which packages are newer or older upstream). The testing repos are omitted.
 
     buildtree -cu
     buildtree -cd
 
-* We can do it in one step:
+- We can do it in one step:
 
     buildtree -scu
 
-* To compare Arch and Artix versions in **_gremlins]/[goblins]_** - **_[testing]/[staging_**, use `-a`:
+- To compare Arch and Artix versions in **_gremlins]/[goblins]_** - **_[testing]/[staging_**, use `-a`:
 
     buildtree -ca
 
