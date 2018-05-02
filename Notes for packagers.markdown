@@ -67,7 +67,7 @@ Usage: commitpkg [options]
 ~~~
 
 ###### commitpkg has following symlinks in place:
-
+~~~
 - extrapkg 
 - corepkg 
 - testingpkg 
@@ -78,7 +78,7 @@ Usage: commitpkg [options]
 - multilibpkg 
 - multilib-testingpkg 
 - multilib-stagingpkg
-
+~~~
 The symlinks above call `commitpkg` which copies the contents of _packages/foo/trunk_ into _packages/foo/repos/$destination_repo/_. Note the use of Arch repo names in the symlinks; this is intentional because it makes it easier to maintain `artools`.
 
 #### Some examples
