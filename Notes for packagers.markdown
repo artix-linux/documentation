@@ -93,7 +93,7 @@ The symlinks above call `commitpkg` which copies the contents of _packages/foo/t
 
 The build server will move `foo` from **_gremlins_** to **_system_**.
 
-##### Packages can only be moved between repos **_only_** after they've been built. If a build has failed, you can't move the package to another repo, because there isn't one (package).
+##### Packages can be moved to another repo **_only_** after they've been built. If a build has failed, you can't move the package, because there isn't one.
 
 ###### Package 'foo2' (already in **_community/galaxy_**) has been updated, as indicated by `buildtree -scu`. We must import the updates into the Artix trunk, edit the source files if needed and push the updates to the build server (again, `-s trunk` can be omitted):
 
